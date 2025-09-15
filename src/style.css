@@ -358,3 +358,22 @@ body {
   20% { opacity: 1; transform: translateY(-3px); }
   40% { opacity: .2; transform: translateY(0); }
 }
+
+.pending-file-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: #1e293b; /* abu gelap */
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.pending-file-preview button {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
