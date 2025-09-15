@@ -197,6 +197,25 @@ export default function ChatBox() {
         <div ref={messagesEndRef} />
       </div>
 
+      {file && (
+        <div className="pending-file-preview" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span>📎 {file.name}</span>
+          <button
+            onClick={() => setFile(null)}
+            style={{
+              background: "transparent",
+              border: "none",
+              color: "#f87171", // merah
+              fontSize: "14px",
+              cursor: "pointer",
+            }}
+            title="Remove file"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
       <div className="input-box">
         <button
           className="upload-btn"
