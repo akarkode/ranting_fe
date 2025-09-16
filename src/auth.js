@@ -10,4 +10,5 @@ export function setToken(token) {
 
 export function clearToken() {
   Cookies.remove("access_token");
+  Cookies.remove("refresh_token");
 }

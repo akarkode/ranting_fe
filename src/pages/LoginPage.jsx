@@ -5,6 +5,8 @@ export default function LoginPage() {
     window.location.href = loginUrl;
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -18,6 +20,28 @@ export default function LoginPage() {
           />
           Continue with Google
         </button>
+
+        {/* Footer branding */}
+        <div
+          className="login-footer"
+          style={{
+            marginTop: "20px",
+            fontSize: "12px",
+            color: "#ffffff",
+            textAlign: "center",
+          }}
+        >
+          Powered by{" "}
+          <a
+            href="https://akarkode.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#ffffff", textDecoration: "underline" }}
+          >
+            Akarkode
+          </a>{" "}
+          © {currentYear}
+        </div>
       </div>
     </div>
   );

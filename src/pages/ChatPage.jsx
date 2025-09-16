@@ -1,5 +1,6 @@
 import { getProfile } from "../api";
 import { clearToken } from "../auth";
+import { LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import ChatBox from "../components/ChatBox";
 
@@ -14,11 +15,11 @@ export default function ChatPage() {
         if (res && res.status === 200) {
           setUser(res.data);
         } else {
-          alert("Gagal memuat profil user");
+          alert("Failed to load user profile");
         }
       } catch (err) {
         console.error("Error fetch user:", err);
-        alert("Tidak dapat mengambil data user. Silakan login ulang.");
+        alert("Unable to fetch user data. Please login again.");
       }
     };
     fetchUser();
@@ -40,6 +41,8 @@ export default function ChatPage() {
     )}&background=0D8ABC&color=fff&rounded=true`;
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="chat-layout">
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
@@ -53,7 +56,7 @@ export default function ChatPage() {
             src={getAvatarUrl(user)}
             alt={user.name}
             onError={(e) => {
-              e.target.onerror = null; // cegah looping
+              e.target.onerror = null;
               e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
                 user.name || "User"
               )}&background=0D8ABC&color=fff&rounded=true`;
@@ -63,9 +66,50 @@ export default function ChatPage() {
             <span className="user-name">{user.name}</span>
             <span className="user-email">{user.email}</span>
           </div>
-          <button className="logout-btn" onClick={clearToken}>
-            Logout
+          <button
+            className="logout-btn"
+            onClick={() => {
+              clearToken();
+              window.location.href = "/login"; // redirect to login
+            }}
+            style={{
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: "#ef4444", // red-500
+              padding: "6px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            title="Logout"
+          >
+            <LogOut size={15} />
           </button>
+
+        </div>
+
+        {/* Footer branding */}
+        <div
+          className="sidebar-footer"
+          style={{
+            marginTop: "auto",
+            fontSize: "12px",
+            color: "#ffffff",        // white text
+            textAlign: "center",
+            padding: "10px",
+          }}
+        >
+          Powered by{" "}
+          <a
+            href="https://akarkode.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#ffffff", textDecoration: "underline" }} // white link
+          >
+            Akarkode
+          </a>{" "}
+          © {currentYear}
         </div>
       </aside>
 
