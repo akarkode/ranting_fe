@@ -30,14 +30,44 @@ export async function getHistory() {
   return res.json();
 }
 
-export async function sendMessage(userMessage, file, onChunk, onEnd) {
+export async function getProfile() {
+  const res = await apiFetch(`${AUTH_URL}/v1/user/me`);
+  if (!res) return null;
+  const data = await res.json();
+  return { status: res.status, data };
+}
+
+export async function uploadFile(file) {
   const formData = new FormData();
-  formData.append("user_message", userMessage);
-  if (file) formData.append("file", file);
+  formData.append("file", file);
+
+  const res = await apiFetch(`${API_URL}/api/chat/file`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error("Failed upload file");
+
+  return res.json(); // { file_type, extension, file_id }
+}
+
+export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
+  const body = {
+    prompt: userMessage,
+  };
+
+  if (fileMeta) {
+    body.file = {
+      file_id: fileMeta.file_id,
+      file_type: fileMeta.file_type,
+      extension: fileMeta.extension,
+    };
+  }
 
   const res = await apiFetch(`${API_URL}/api/chat`, {
     method: "POST",
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
 
   if (!res || !res.body) return;
@@ -78,11 +108,4 @@ export async function sendMessage(userMessage, file, onChunk, onEnd) {
       }
     }
   }
-}
-
-export async function getProfile() {
-  const res = await apiFetch(`${AUTH_URL}/v1/user/me`);
-  if (!res) return null;
-  const data = await res.json();
-  return { status: res.status, data };
 }
