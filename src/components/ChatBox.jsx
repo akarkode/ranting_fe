@@ -8,7 +8,8 @@ export default function ChatBox() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [file, setFile] = useState(null);
+  const [fileMeta, setFileMeta] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -36,33 +37,22 @@ export default function ChatBox() {
   }, [messages, isTyping]);
 
   const handleSend = async () => {
-    if (!input.trim() && !file) return;
-
-    let fileMeta = null;
-    if (file) {
-      try {
-        fileMeta = await uploadFile(file);
-      } catch (err) {
-        console.error("File upload failed:", err);
-        return;
-      }
-    }
+    if (!input.trim() && !fileMeta) return;
 
     const userMsg = {
       role: "user",
       content: input,
-      file: file ? { name: file.name, type: file.type } : null,
-      filename: file ? file.name : null,
+      filename: fileMeta ? fileMeta.filename : null,
     };
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    setFile(null);
     setIsTyping(true);
 
     try {
       await sendMessage(
         input,
-        fileMeta,
+        fileMeta, // pass metadata (with file_id) instead of raw file
         (chunk) => {
           setIsTyping(false);
           setMessages((prev) => {
@@ -93,6 +83,8 @@ export default function ChatBox() {
     } catch (err) {
       setIsTyping(false);
       console.error("Chat error:", err);
+    } finally {
+      setFileMeta(null);
     }
   };
 
@@ -103,17 +95,21 @@ export default function ChatBox() {
       textareaRef.current.scrollHeight + "px";
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) setFile(e.target.files[0]);
+  const handleFileChange = async (e) => {
+    if (e.target.files.length > 0) {
+      const selectedFile = e.target.files[0];
+      setUploading(true);
+      try {
+        const uploaded = await uploadFile(selectedFile);
+        setFileMeta(uploaded); // { file_id, file_type, extension, filename }
+      } catch (err) {
+        console.error("File upload failed:", err);
+        alert("File upload failed");
+      } finally {
+        setUploading(false);
+      }
+    }
   };
-
-  const toBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
 
   const renderers = {
     code({ node, inline, className, children, ...props }) {
@@ -208,14 +204,24 @@ export default function ChatBox() {
         <div ref={messagesEndRef} />
       </div>
 
-      {file && (
+      {/* File upload state */}
+      {uploading && (
         <div
           className="pending-file-preview"
           style={{ display: "flex", alignItems: "center", gap: "8px" }}
         >
-          <span>📎 {file.name}</span>
+          <span>📎 Uploading file...</span>
+          <div className="spinner"></div>
+        </div>
+      )}
+      {fileMeta && !uploading && (
+        <div
+          className="pending-file-preview"
+          style={{ display: "flex", alignItems: "center", gap: "8px" }}
+        >
+          <span>📎 {fileMeta.filename}</span>
           <button
-            onClick={() => setFile(null)}
+            onClick={() => setFileMeta(null)}
             style={{
               background: "transparent",
               border: "none",
@@ -255,7 +261,7 @@ export default function ChatBox() {
         <button
           className="send-btn"
           onClick={handleSend}
-          disabled={!input.trim() && !file}
+          disabled={!input.trim() && !fileMeta}
         >
           ➤
         </button>
