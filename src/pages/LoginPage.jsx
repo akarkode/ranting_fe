@@ -2,7 +2,7 @@ const AUTH_URL = import.meta.env.VITE_AUTH_URL;
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
-    window.location.href = `${AUTH_URL}/v1/auth/google/login`;
+    window.location.href = `${AUTH_URL}/v1/google/login`;
   };
 
   const currentYear = new Date().getFullYear();
