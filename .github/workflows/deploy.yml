@@ -33,9 +33,10 @@ jobs:
       - name: Build and Push Docker image
         run: |
           IMAGE="asia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ranting-repo/fe-service:latest"
-          echo "VITE_AUTH_URL=${{ secrets.AUTH_URL }}" >> .env
-          echo "VITE_API_URL=${{ secrets.API_URL }}" >> .env
-          docker build -t $IMAGE .
+          docker build \
+            --build-arg VITE_AUTH_URL=${{ secrets.AUTH_URL }} \
+            --build-arg VITE_API_URL=${{ secrets.API_URL }} \
+            -t $IMAGE .
           docker push $IMAGE
 
       - name: Deploy to Cloud Run
