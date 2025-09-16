@@ -17,6 +17,7 @@ async function apiFetch(url, options = {}) {
 
   if (res.status === 401) {
     clearToken();
+    alert("👋Looks like your session ended. Please login to get back in.")
     window.location.href = "/login";
     return null;
   }
