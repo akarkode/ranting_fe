@@ -170,11 +170,14 @@ export default function ChatBox() {
                 className="file-label"
                 style={{
                   fontSize: "12px",
-                  color: "#6b7280",
+                  color: "#e3e8f1",
                   marginBottom: "4px",
+                  borderRadius: "4px",
+                  padding: "2px 6px",
+                  display: "inline-block"
                 }}
               >
-                📎 {m.filename}
+                📜 {m.filename}
               </div>
             )}
 
@@ -210,7 +213,7 @@ export default function ChatBox() {
           className="pending-file-preview"
           style={{ display: "flex", alignItems: "center", gap: "8px" }}
         >
-          <span>📎 Uploading file...</span>
+          <span>📜 Uploading file...</span>
           <div className="spinner"></div>
         </div>
       )}
@@ -219,7 +222,7 @@ export default function ChatBox() {
           className="pending-file-preview"
           style={{ display: "flex", alignItems: "center", gap: "8px" }}
         >
-          <span>📎 {fileMeta.filename}</span>
+          <span>📜 {fileMeta.filename}</span>
           <button
             onClick={() => setFileMeta(null)}
             style={{
