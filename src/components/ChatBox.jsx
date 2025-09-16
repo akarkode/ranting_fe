@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { sendMessage, uploadFile, getHistory } from "../api";
+import { sendMessage, getHistory, uploadFile } from "../api";
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([]);
@@ -21,7 +21,7 @@ export default function ChatBox() {
           setMessages(history);
         }
       } catch (err) {
-        console.error("Gagal ambil history:", err);
+        console.error("Failed to fetch history:", err);
       }
     };
     fetchHistory();
@@ -43,7 +43,7 @@ export default function ChatBox() {
       try {
         fileMeta = await uploadFile(file);
       } catch (err) {
-        console.error("Gagal upload file:", err);
+        console.error("File upload failed:", err);
         return;
       }
     }
@@ -52,6 +52,7 @@ export default function ChatBox() {
       role: "user",
       content: input,
       file: file ? { name: file.name, type: file.type } : null,
+      filename: file ? file.name : null,
     };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
@@ -105,6 +106,14 @@ export default function ChatBox() {
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) setFile(e.target.files[0]);
   };
+
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
 
   const renderers = {
     code({ node, inline, className, children, ...props }) {
@@ -160,26 +169,31 @@ export default function ChatBox() {
       <div className="messages">
         {messages.map((m, i) => (
           <div key={i} className={`message ${m.role}`}>
+            {m.role === "user" && m.filename && (
+              <div
+                className="file-label"
+                style={{
+                  fontSize: "12px",
+                  color: "#6b7280",
+                  marginBottom: "4px",
+                }}
+              >
+                📎 {m.filename}
+              </div>
+            )}
+
             {m.content && (
               <ReactMarkdown components={renderers}>{m.content}</ReactMarkdown>
             )}
-            {m.file && (
+            {m.file && m.role === "assistant" && (
               <div className="file-preview">
                 {m.file.type.startsWith("image/") ? (
                   <img
-                    src={m.file.b64 || URL.createObjectURL(file)}
+                    src={m.file.b64}
                     alt={m.file.name || "image"}
                     style={{ maxWidth: "200px", borderRadius: "8px" }}
                   />
-                ) : (
-                  <a
-                    href={m.file.b64}
-                    download={m.file.name}
-                    className="file-link"
-                  >
-                    📎 {m.file.name}
-                  </a>
-                )}
+                ) : null}
               </div>
             )}
           </div>
@@ -233,7 +247,7 @@ export default function ChatBox() {
         <textarea
           ref={textareaRef}
           rows="1"
-          placeholder="Tanyakan apa saja..."
+          placeholder="Ask anything..."
           value={input}
           onChange={handleInputChange}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}

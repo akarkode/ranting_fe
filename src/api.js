@@ -1,7 +1,7 @@
 import { getToken, clearToken } from "./auth";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const AUTH_URL = import.meta.env.VITE_AUTH_URL; 
+const AUTH_URL = import.meta.env.VITE_AUTH_URL;
 
 async function apiFetch(url, options = {}) {
   const token = getToken();
@@ -30,13 +30,6 @@ export async function getHistory() {
   return res.json();
 }
 
-export async function getProfile() {
-  const res = await apiFetch(`${AUTH_URL}/v1/user/me`);
-  if (!res) return null;
-  const data = await res.json();
-  return { status: res.status, data };
-}
-
 export async function uploadFile(file) {
   const formData = new FormData();
   formData.append("file", file);
@@ -46,11 +39,11 @@ export async function uploadFile(file) {
     body: formData,
   });
 
-  if (!res.ok) throw new Error("Failed upload file");
-
-  return res.json(); // { file_type, extension, file_id }
+  if (!res) throw new Error("File upload failed");
+  return res.json(); // { file_id, file_type, extension, filename }
 }
 
+// Step 2: send message with optional file metadata
 export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
   const body = {
     prompt: userMessage,
@@ -61,6 +54,7 @@ export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
       file_id: fileMeta.file_id,
       file_type: fileMeta.file_type,
       extension: fileMeta.extension,
+      filename: fileMeta.filename,
     };
   }
 
@@ -104,8 +98,15 @@ export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
           onEnd(data.fileb64 || null);
         }
       } catch (err) {
-        console.warn("Parse gagal:", line, err);
+        console.warn("Failed to parse:", line, err);
       }
     }
   }
+}
+
+export async function getProfile() {
+  const res = await apiFetch(`${AUTH_URL}/v1/user/me`);
+  if (!res) return null;
+  const data = await res.json();
+  return { status: res.status, data };
 }
