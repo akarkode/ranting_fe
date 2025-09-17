@@ -26,7 +26,7 @@ async function apiFetch(url, options = {}) {
 }
 
 export async function getHistory() {
-  const res = await apiFetch(`${API_URL}/api/chat`, { method: "GET" });
+  const res = await apiFetch(`${API_URL}/chat`, { method: "GET" });
   if (!res) return [];
   return res.json();
 }
@@ -35,7 +35,7 @@ export async function uploadFile(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const res = await apiFetch(`${API_URL}/api/chat/file`, {
+  const res = await apiFetch(`${API_URL}/chat/file`, {
     method: "POST",
     body: formData,
   });
@@ -59,7 +59,7 @@ export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
     };
   }
 
-  const res = await apiFetch(`${API_URL}/api/chat`, {
+  const res = await apiFetch(`${API_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
