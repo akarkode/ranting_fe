@@ -70,7 +70,7 @@ export default function ChatPage() {
             className="logout-btn"
             onClick={() => {
               clearToken();
-              window.location.href = "/login"; // redirect to login
+              window.location.href = "/"; // redirect to login
             }}
             style={{
               background: "transparent",

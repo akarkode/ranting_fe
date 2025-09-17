@@ -15,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
         <Route path="/" element={isLoggedIn ? <ChatPage /> : <LoginPage />} />
       </Routes>
     </BrowserRouter>
