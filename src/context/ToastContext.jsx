@@ -7,12 +7,19 @@ export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
   const addToast = useCallback((message, type = "info") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3000);
-  }, []);
+  const id = Date.now();
+
+  setToasts((prev) => {
+    if (prev.some((t) => t.message === message && t.type === type)) {
+      return prev;
+    }
+    return [...prev, { id, message, type }];
+  });
+
+  setTimeout(() => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, 3000);
+}, []);
 
   return (
     <ToastContext.Provider value={{ addToast }}>
