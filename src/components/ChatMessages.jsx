@@ -1,30 +1,21 @@
 import { useEffect, useRef } from "react";
+import TypingIndicator from "./TypingIndicator";
+import Message from "./Message";
+import "../styles/ChatMessages.css";
 
 export default function ChatMessages({ messages, isTyping }) {
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
   return (
     <div className="messages">
       {messages.map((m, i) => (
-        <div key={i} className={`message ${m.role}`}>
-          {m.content}
-        </div>
+        <Message key={i} role={m.role} content={m.content} fileb64={m.file?.b64} />
       ))}
-      {isTyping && (
-        <div className="typing-indicator">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      )}
+      {isTyping && <TypingIndicator />}
       <div ref={messagesEndRef} />
     </div>
   );
