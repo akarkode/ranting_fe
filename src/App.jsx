@@ -29,7 +29,6 @@ function App() {
         }
       >
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={loggedIn ? <ChatPage /> : <LoginPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
