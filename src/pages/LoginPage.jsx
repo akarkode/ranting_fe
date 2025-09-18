@@ -1,3 +1,5 @@
+import "./../styles/LoginPage.css";
+
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
 
 export default function LoginPage() {
@@ -10,8 +12,11 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1 className="title">Ranting AI Assistant</h1>
-        <p className="subtitle">Your smart companion for chat, files, and creativity</p>
+        <h1 className="title">🌿 Ranting AI Assistant</h1>
+        <p className="subtitle">
+          Your smart companion for chat, files, and creativity
+        </p>
+
         <button className="google-btn" onClick={handleGoogleLogin}>
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -21,27 +26,17 @@ export default function LoginPage() {
           Continue with Google
         </button>
 
-        {/* Footer branding */}
-        <div
-          className="login-footer"
-          style={{
-            marginTop: "20px",
-            fontSize: "12px",
-            color: "#ffffff",
-            textAlign: "center",
-          }}
-        >
+        <footer className="login-footer">
           Powered by{" "}
           <a
             href="https://akarkode.com"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#ffffff", textDecoration: "underline" }}
           >
             Akarkode
           </a>{" "}
           © {currentYear}
-        </div>
+        </footer>
       </div>
     </div>
   );
