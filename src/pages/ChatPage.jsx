@@ -13,13 +13,16 @@ export default function ChatPage() {
     const fetchUser = async () => {
       try {
         const res = await getProfile();
-        if (res && res.status === 200) {
+        if (res.status === 200) {
           setUser(res.data);
-        } else {
-          console.error("Failed to load user profile");
         }
       } catch (err) {
-        console.error("Error fetch user:", err);
+        if (err.name === "ApiError" && err.status === 401) {
+          alert("⚠️ Session expired, redirecting to login...");
+          window.location.href = "/login";
+        } else {
+          alert(`❌ ${err.message}`);
+        }
       }
     };
     fetchUser();
