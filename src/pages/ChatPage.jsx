@@ -1,8 +1,9 @@
+import { useState, useEffect } from "react";
 import { getProfile } from "../api";
 import { clearToken } from "../auth";
 import { LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
 import ChatBox from "../components/ChatBox";
+import "../styles/ChatPage.css";
 
 export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -15,11 +16,10 @@ export default function ChatPage() {
         if (res && res.status === 200) {
           setUser(res.data);
         } else {
-          alert("Failed to load user profile");
+          console.error("Failed to load user profile");
         }
       } catch (err) {
         console.error("Error fetch user:", err);
-        alert("Unable to fetch user data. Please login again.");
       }
     };
     fetchUser();
@@ -33,7 +33,6 @@ export default function ChatPage() {
     );
   }
 
-  // Avatar fallback generator
   const getAvatarUrl = (user) => {
     if (user.picture) return user.picture;
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -45,19 +44,21 @@ export default function ChatPage() {
 
   return (
     <div className="chat-layout">
+      {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
         <div className="brand">🌿 Ranting AI</div>
+
         <div className="sidebar-content">
           <p className="comingsoon">+ New Chat (soon)</p>
         </div>
+
         <div className="profile">
           <img
             className="avatar"
             src={getAvatarUrl(user)}
             alt={user.name}
             onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
                 user.name || "User"
               )}&background=0D8ABC&color=fff&rounded=true`;
             }}
@@ -70,49 +71,28 @@ export default function ChatPage() {
             className="logout-btn"
             onClick={() => {
               clearToken();
-              window.location.href = "/"; // redirect to login
-            }}
-            style={{
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              color: "#ef4444", // red-500
-              padding: "6px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              window.location.href = "/";
             }}
             title="Logout"
           >
             <LogOut size={15} />
           </button>
-
         </div>
 
-        {/* Footer branding */}
-        <div
-          className="sidebar-footer"
-          style={{
-            marginTop: "auto",
-            fontSize: "12px",
-            color: "#ffffff",        // white text
-            textAlign: "center",
-            padding: "10px",
-          }}
-        >
+        <footer className="sidebar-footer">
           Powered by{" "}
           <a
             href="https://akarkode.com"
             target="_blank"
             rel="noopener noreferrer"
-            style={{ color: "#ffffff", textDecoration: "underline" }} // white link
           >
             Akarkode
           </a>{" "}
           © {currentYear}
-        </div>
+        </footer>
       </aside>
 
+      {/* Main */}
       <div className="main">
         <header className="chat-header">
           <button
@@ -124,6 +104,7 @@ export default function ChatPage() {
           </button>
           <h1>Ranting AI Assistant</h1>
         </header>
+
         <main className="chat-main">
           <ChatBox />
         </main>
