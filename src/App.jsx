@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { isLoggedIn } from "./auth";
 import { useToast } from "./context/ToastContext";
-import "./styles/globals.css";
+import "../src/styles/globals.css";
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage"));
