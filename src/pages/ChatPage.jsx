@@ -52,7 +52,7 @@ export default function ChatPage() {
           >
             ☰
           </button>
-          <h1>Ranting AI Assistant</h1>
+          <h1>🌿 Ranting AI Assistant</h1>
         </header>
         <main className="chat-main">
           <ChatBox />
