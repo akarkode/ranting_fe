@@ -16,7 +16,7 @@ export default function Sidebar({ open, user }) {
     <aside className={`sidebar ${open ? "open" : "closed"}`}>
       <div className="brand">🌿 Ranting AI</div>
       <div className="sidebar-content">
-        <p className="comingsoon">+ New Chat (soon)</p>
+        <p className="comingsoon"></p>
       </div>
       <div className="profile">
         <img

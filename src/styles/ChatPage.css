@@ -1,7 +1,6 @@
 .chat-layout {
   display: flex;
   height: 100vh;
-  overflow: hidden;
 }
 .main {
   flex: 1;
@@ -18,7 +17,7 @@
   backdrop-filter: blur(6px);
   position: sticky;
   top: 0;
-  z-index: 5;
+  z-index: 500;
 }
 .chat-header h1 {
   font-size: 18px;
@@ -56,6 +55,31 @@
 }
 
 @media (max-width: 768px) {
+  .chat-header {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .chat-header h1 {
+    font-size: 16px;
+  }
+  .chat-main {
+    padding: 0;
+    min-height: 0;
+  }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 20;
+    transform: translateX(0);
+    transition: transform 0.3s ease-in-out;
+  }
+  .sidebar.closed {
+    transform: translateX(-100%);
+    opacity: 1;
+    width: 260px;
+  }
   .sidebar-overlay {
     position: fixed;
     top: 0;
