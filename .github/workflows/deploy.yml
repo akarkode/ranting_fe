@@ -46,7 +46,6 @@ jobs:
             --image $IMAGE \
             --region asia-southeast2 \
             --platform managed \
-            --port 8080 \
             --cpu 1 \
             --memory 512Mi \
             --concurrency 80 \
