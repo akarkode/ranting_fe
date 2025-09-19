@@ -22,10 +22,5 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-RUN mkdir -p /run/nginx \
-  && chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run /var/log/nginx
-
-USER nginx
-
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
