@@ -1,5 +1,8 @@
 .messages {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -120,12 +123,24 @@
   100% { transform: rotate(360deg); }
 }
 
+.chatbox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .chat-input {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: rgba(15, 23, 42, 0.95);
   border-top: 1px solid #1e293b;
   flex-shrink: 0;
 }
@@ -154,6 +169,7 @@
   align-items: center;
   gap: 8px;
   background: #0f172a;
+  border-radius: 40px;
   padding: 8px 12px;
 }
 

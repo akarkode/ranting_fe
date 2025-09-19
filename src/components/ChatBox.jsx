@@ -4,6 +4,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { sendMessage, getHistory, uploadFile } from "../api";
 import TypingIndicator from "./TypingIndicator";
+import ChatInput from "./ChatInput";
 import "../styles/ChatBox.css";
 
 export default function ChatBox() {
@@ -13,8 +14,6 @@ export default function ChatBox() {
   const [fileMeta, setFileMeta] = useState(null);
   const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -41,7 +40,9 @@ export default function ChatBox() {
       filename: fileMeta?.filename || null,
     };
     setMessages((prev) => [...prev, userMsg]);
+
     setInput("");
+    setFileMeta(null); // reset langsung biar preview hilang
     setIsTyping(true);
 
     try {
@@ -53,7 +54,10 @@ export default function ChatBox() {
           setMessages((prev) => {
             const last = prev[prev.length - 1];
             if (last?.role === "assistant") {
-              return [...prev.slice(0, -1), { ...last, content: last.content + chunk }];
+              return [
+                ...prev.slice(0, -1),
+                { ...last, content: last.content + chunk },
+              ];
             }
             return [...prev, { role: "assistant", content: chunk }];
           });
@@ -76,15 +80,7 @@ export default function ChatBox() {
       setIsTyping(false);
       console.error("Chat error:", err);
       alert("⚠️ Failed to send message. Please try again.");
-    } finally {
-      setFileMeta(null);
     }
-  };
-
-  const handleInputChange = (e) => {
-    setInput(e.target.value);
-    textareaRef.current.style.height = "auto";
-    textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
   };
 
   const handleFileChange = async (e) => {
@@ -116,15 +112,25 @@ export default function ChatBox() {
 
       return !inline && match ? (
         <div className="code-block">
-          <button className={`copy-btn ${copied ? "copied" : ""}`} onClick={handleCopy}>
+          <button
+            className={`copy-btn ${copied ? "copied" : ""}`}
+            onClick={handleCopy}
+          >
             {copied ? "Copied!" : "Copy"}
           </button>
-          <SyntaxHighlighter style={oneDark} language={match[1]} PreTag="div" {...props}>
+          <SyntaxHighlighter
+            style={oneDark}
+            language={match[1]}
+            PreTag="div"
+            {...props}
+          >
             {code}
           </SyntaxHighlighter>
         </div>
       ) : (
-        <code className={className} {...props}>{children}</code>
+        <code className={className} {...props}>
+          {children}
+        </code>
       );
     },
   };
@@ -138,7 +144,9 @@ export default function ChatBox() {
               <div className="file-label">📜 {m.filename}</div>
             )}
             {m.content && (
-              <ReactMarkdown components={MarkdownComponents}>{m.content}</ReactMarkdown>
+              <ReactMarkdown components={MarkdownComponents}>
+                {m.content}
+              </ReactMarkdown>
             )}
             {m.file && m.role === "assistant" && (
               <div className="file-preview">
@@ -153,36 +161,15 @@ export default function ChatBox() {
         <div ref={messagesEndRef} />
       </div>
 
-      {uploading && (
-        <div className="pending-file-preview">
-          <span>📜 Uploading file...</span>
-          <div className="spinner"></div>
-        </div>
-      )}
-      {fileMeta && !uploading && (
-        <div className="pending-file-preview">
-          <span>📜 {fileMeta.filename}</span>
-          <button onClick={() => setFileMeta(null)} title="Remove file">✕</button>
-        </div>
-      )}
-
-      <div className="input-box">
-        <button className="upload-btn" onClick={() => fileInputRef.current.click()} type="button">
-          ➕
-        </button>
-        <input type="file" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
-        <textarea
-          ref={textareaRef}
-          rows="1"
-          placeholder="Ask anything..."
-          value={input}
-          onChange={handleInputChange}
-          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
-        />
-        <button className="send-btn" onClick={handleSend} disabled={!input.trim() && !fileMeta}>
-          ➤
-        </button>
-      </div>
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        onSend={handleSend}
+        fileMeta={fileMeta}
+        setFileMeta={setFileMeta}
+        onFileChange={handleFileChange}
+        uploading={uploading}
+      />
     </div>
   );
 }
