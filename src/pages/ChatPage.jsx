@@ -35,6 +35,14 @@ export default function ChatPage() {
   return (
     <div className="chat-layout">
       <Sidebar open={sidebarOpen} user={user} />
+
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       <div className="main">
         <header className="chat-header">
           <button
