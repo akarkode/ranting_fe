@@ -1,7 +1,15 @@
-import { getToken, clearToken } from "./auth";
+import { getToken, clearToken } from "../auth";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
+
+class ApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
 
 async function apiFetch(url, options = {}) {
   const token = getToken();
@@ -10,16 +18,25 @@ async function apiFetch(url, options = {}) {
     ...options,
     headers: {
       ...(options.headers || {}),
-      Authorization: `Bearer ${token}`,
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     credentials: "include",
   });
 
   if (res.status === 401) {
     clearToken();
-    alert("👋Looks like your session ended. Please login to get back in.")
-    window.location.href = "/";
-    return null;
+    throw new ApiError("Session expired. Please log in again.", 401);
+  }
+
+  if (!res.ok) {
+    let message = `Request failed with status ${res.status}`;
+    try {
+      const errData = await res.json();
+      message = errData.message || message;
+    } catch {
+      // ignore JSON parse error
+    }
+    throw new ApiError(message, res.status);
   }
 
   return res;
@@ -27,7 +44,6 @@ async function apiFetch(url, options = {}) {
 
 export async function getHistory() {
   const res = await apiFetch(`${API_URL}/chat`, { method: "GET" });
-  if (!res) return [];
   return res.json();
 }
 
@@ -40,15 +56,11 @@ export async function uploadFile(file) {
     body: formData,
   });
 
-  if (!res) throw new Error("File upload failed");
-  return res.json(); // { file_id, file_type, extension, filename }
+  return res.json();
 }
 
-// Step 2: send message with optional file metadata
 export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
-  const body = {
-    prompt: userMessage,
-  };
+  const body = { prompt: userMessage };
 
   if (fileMeta) {
     body.file = {
@@ -65,7 +77,7 @@ export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
     body: JSON.stringify(body),
   });
 
-  if (!res || !res.body) return;
+  if (!res.body) return;
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -107,7 +119,6 @@ export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
 
 export async function getProfile() {
   const res = await apiFetch(`${AUTH_URL}/v1/user/me`);
-  if (!res) return null;
   const data = await res.json();
   return { status: res.status, data };
 }

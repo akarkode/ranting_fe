@@ -1,23 +1,45 @@
-import { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { getToken } from "./auth";
-import LoginPage from "./pages/LoginPage";
-import ChatPage from "./pages/ChatPage";
-import "./style.css";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Suspense, lazy, useEffect } from "react";
+import { isLoggedIn } from "./auth";
+import { useToast } from "./context/ToastContext";
+import "./styles/globals.css";
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
+
+function AppRoutes() {
+  const { addToast } = useToast();
+  const loggedIn = isLoggedIn();
+  const location = useLocation();
 
   useEffect(() => {
-    setIsLoggedIn(!!getToken());
-  }, []);
+    if (!loggedIn && location.pathname === "/") {
+      addToast("⚠️ Please login to continue", "warning");
+    }
+  }, [loggedIn, addToast, location]);
 
   return (
+    <Routes>
+      <Route path="/" element={loggedIn ? <ChatPage /> : <LoginPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={isLoggedIn ? <ChatPage /> : <LoginPage />} />
-      </Routes>
+      <Suspense
+        fallback={
+          <div className="global-loading">
+            <div className="spinner" />
+            <p>Loading app...</p>
+          </div>
+        }
+      >
+        <AppRoutes />
+      </Suspense>
     </BrowserRouter>
   );
 }

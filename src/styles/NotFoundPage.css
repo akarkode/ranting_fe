@@ -1,0 +1,41 @@
+.notfound-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  color: #f8fafc;
+}
+
+.notfound-container h1,
+.notfound-container p {
+  margin: 0 0 12px 0;
+  color: #e2e8f0;
+}
+
+.notfound-img {
+  width: 280px;
+  margin-bottom: 24px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.back-home {
+  margin-top: 20px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.back-home:hover {
+  background: #1d4ed8;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
