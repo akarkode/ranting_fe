@@ -3,11 +3,21 @@ import { getToken, clearToken } from "../auth";
 const API_URL = import.meta.env.VITE_API_URL;
 const AUTH_URL = import.meta.env.VITE_AUTH_URL;
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(message, status) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+  }
+}
+
+function redirectToLogin() {
+  clearToken();
+  const dest = "/";
+  if (window.location.pathname !== dest) {
+    window.location.href = dest;
+  } else {
+    window.location.reload()
   }
 }
 
@@ -23,9 +33,9 @@ async function apiFetch(url, options = {}) {
     credentials: "include",
   });
 
-  if (res.status === 401) {
-    clearToken();
-    throw new ApiError("Session expired. Please log in again.", 401);
+  if (res.status === 401 || res.status === 403) {
+    redirectToLogin();
+    throw new ApiError("Unauthorized", res.status);
   }
 
   if (!res.ok) {
@@ -33,9 +43,7 @@ async function apiFetch(url, options = {}) {
     try {
       const errData = await res.json();
       message = errData.message || message;
-    } catch {
-      // ignore JSON parse error
-    }
+    } catch {}
     throw new ApiError(message, res.status);
   }
 
@@ -50,18 +58,12 @@ export async function getHistory() {
 export async function uploadFile(file) {
   const formData = new FormData();
   formData.append("file", file);
-
-  const res = await apiFetch(`${API_URL}/chat/file`, {
-    method: "POST",
-    body: formData,
-  });
-
+  const res = await apiFetch(`${API_URL}/chat/file`, { method: "POST", body: formData });
   return res.json();
 }
 
 export async function sendMessage(userMessage, fileMeta, onChunk, onEnd) {
   const body = { prompt: userMessage };
-
   if (fileMeta) {
     body.file = {
       file_id: fileMeta.file_id,

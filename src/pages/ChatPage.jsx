@@ -9,19 +9,10 @@ export default function ChatPage() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await getProfile();
-        if (res.status === 200) {
-          setUser(res.data);
-        }
-      } catch (err) {
-        if (err.name === "ApiError" && err.status === 401) {
-          window.location.href = "/login";
-        }
-      }
-    };
-    fetchUser();
+    (async () => {
+      const res = await getProfile();
+      if (res.status === 200) setUser(res.data);
+    })();
   }, []);
 
   if (!user) {
@@ -35,14 +26,7 @@ export default function ChatPage() {
   return (
     <div className="chat-layout">
       <Sidebar open={sidebarOpen} user={user} />
-
-      {sidebarOpen && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
+      {sidebarOpen && <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />}
       <div className="main">
         <header className="chat-header">
           <button
